@@ -13,6 +13,8 @@ pandas = "^2.2.1"
 bs4 = "^0.0.2"
 lxml = "^5.1.0"
 yfinance = "^0.2.37"
+fastapi = "^0.110.0"
+uvicorn = {extras = ["standard"], version = "^0.28.0"}
 
 
 [build-system]
