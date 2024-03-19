@@ -17,7 +17,7 @@ def get_response(url: str) -> bs:
     soup = bs(response.text, 'lxml')
     return soup
 
-def parse_html(soup: bs):
+def parse_html(soup: bs) -> dict[str, list[dict]]:
 
     # 主欄位
     first_columns = soup.select_one('table.TableV1 tr.C.TableV2Field')
@@ -31,22 +31,22 @@ def parse_html(soup: bs):
         data.append([td.get_text() for td in tag if td != '\n' and td != ' '])
 
     df = pd.DataFrame(data[1:], columns= data[0])
+    df['履約價'] = df['履約價'].astype(int)
     df.replace('--', pd.NA, inplace=True)
-# region
-    '''
+
+# region Dataframe tramsform to json
+
     # combine with json
     call_df = df[df.columns[:6]].to_dict(orient='records')
-    put_df = df[df.columns[6:]].to_dict(orient='records')
+    put_df = df[df.columns[5:]].to_dict(orient='records')
 
     merge_json = {
         '買權': call_df,
         '賣權': put_df
         }
-    json_data = json.dumps(merge_json,ensure_ascii=False)
-    '''
+    
 # endregion
-    return df
-
+    return merge_json
     
 @debug
 def main():
