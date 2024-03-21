@@ -2,8 +2,6 @@ from pydantic import BaseModel,Field
 from typing import List
 
 
-
-
 class StrikePriceRequest(BaseModel):
     strike_price: int
 

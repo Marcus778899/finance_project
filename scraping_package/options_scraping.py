@@ -1,7 +1,7 @@
 import requests as req
 import pandas as pd
 from bs4 import BeautifulSoup as bs
-import json
+from datetime import datetime, timedelta
 
 def debug(func):
     def wrapper(*args, **kwargs):
@@ -13,11 +13,13 @@ def debug(func):
     return wrapper
 
 def get_response(url: str) -> bs:
+
+    time_now = datetime.now()
     response = req.get(url)
     soup = bs(response.text, 'lxml')
-    return soup
+    return soup, time_now
 
-def parse_html(soup: bs) -> dict[str, list[dict]]:
+def parse_html(soup: bs, time_now: datetime) -> dict[str, list[dict]]:
 
     # 主欄位
     first_columns = soup.select_one('table.TableV1 tr.C.TableV2Field')
@@ -41,6 +43,7 @@ def parse_html(soup: bs) -> dict[str, list[dict]]:
     put_df = df[df.columns[5:]].to_dict(orient='records')
 
     merge_json = {
+        '時間': time_now,
         '買權': call_df,
         '賣權': put_df
         }
@@ -51,8 +54,8 @@ def parse_html(soup: bs) -> dict[str, list[dict]]:
 @debug
 def main():
     url = 'https://ww2.money-link.com.tw/FutOpt/TWChoose.aspx'
-    soup = get_response(url)
-    test = parse_html(soup)
+    soup, time_now = get_response(url)
+    test = parse_html(soup, time_now)
 
     return test
 
