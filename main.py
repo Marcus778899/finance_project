@@ -1,4 +1,9 @@
-import uvicorn
-from api.webapi import app
+from scraping_package import stock_scraping
+from database_package import mysql_action
 
-uvicorn.run(app, host='127.0.0.1',port=8080)
+action = stock_scraping
+
+action.test()
+
+action_sql = mysql_action
+action_sql.test_conn()

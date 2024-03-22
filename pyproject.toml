@@ -16,6 +16,8 @@ yfinance = "^0.2.37"
 fastapi = {extras = ["all"], version = "^0.110.0"}
 uvicorn = {extras = ["standard"], version = "^0.28.0"}
 pydantic = "^2.6.4"
+pymysql = "^1.1.0"
+sqlalchemy = "^2.0.28"
 
 
 [build-system]

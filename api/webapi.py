@@ -1,5 +1,4 @@
 from fastapi import FastAPI
-import requests as req
 from api.response_model import StrikePriceRequest
 from scraping_package import options_scraping
 
@@ -7,6 +6,8 @@ from scraping_package import options_scraping
 
 app = FastAPI(
     title="Options Data",
+    docs_url='/',
+    redoc_url=None
 )
 
 merge_df = options_scraping.main()
