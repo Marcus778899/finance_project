@@ -57,5 +57,5 @@ def main() -> Iterator[pd.DataFrame]:
     return results
 
 def test():
-    scraping_stock_price('2330.TW')
-    print('TSMC scraping Done')
+    return scraping_stock_price('2330.TW')
+    # print('TSMC scraping Done')

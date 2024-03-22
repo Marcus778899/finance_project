@@ -2,6 +2,7 @@ import pymysql
 import pymysql.cursors
 from secret import key
 import pandas as pd
+from datetime import datetime
 
 def get_conn():
     conn = pymysql.connect(
@@ -18,15 +19,38 @@ def get_conn():
     finally:
         conn.close()
 
-def test_conn():
-    conn,cursor = next(get_conn())
-    conn.ping(reconnect=True)
-    cursor.execute('SHOW DATABASES')
-    conn.commit()
+def create_table(table_name: str) -> str:
+    '''
+    return query script
+    '''
+    table_schema = pd.read_excel(f'./database_package/table_schema.xlsx', sheet_name=table_name)
+    table_schema = table_schema.to_dict('records')
+    sql = f'CREATE TABLE IF NOT EXISTS {table_name} ('
+    for schema in table_schema:
+        sql += f'`{schema["column"]}` {schema["data_type"]},'
+    sql = sql[:-1] + ')'
+    
+    return sql
 
-def create_table(table_name: str):
+def insert_data(table_name: str, data: pd.DataFrame) -> str:
+    '''
+    return query script
+    '''
+    columns = ', '.join(['`' + col + '`' for col in data.columns])
+    query = f"INSERT INTO {table_name} ({columns}) VALUES "
+    for _, row in data.iterrows():
+        query += f'{tuple(row)},'
+    query = query[:-1] + ';'
+
+    return query
+
+def execute_query(query: str) -> None:
+    '''
+    execute query
+    '''
     conn, cursor = next(get_conn())
     conn.ping(reconnect=True)
-    cursor.execute(f'CREATE TABLE IF NOT EXISTS {table_name}(stock_id VARCHAR(10) PRIMARY KEY, stock_name VARCHAR(20), stock_type VARCHAR(10))')
+    cursor.execute(query)
     conn.commit()
-    print(f'Create table {table_name} Done')
+
+    print(f'Query executed: \n{query}')
