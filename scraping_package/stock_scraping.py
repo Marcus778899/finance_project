@@ -36,7 +36,7 @@ def scraping_stock_price(stock_id: str) -> pd.DataFrame:
     try:
         date = datetime.now().date()
         stock = yf.Ticker(stock_id)
-        df = stock.history(start=date - timedelta(days=1), end=date + timedelta(days=1), interval='1d')
+        df = stock.history(start=datetime.now().date(), end=date + timedelta(days=1), interval='1d')
         df.reset_index(inplace=True)
         df['Date'] = pd.to_datetime(df['Date'].dt.strftime('%Y-%m-%d'))
         df['stock_id'] = stock_id.split('.')[0]
@@ -57,5 +57,5 @@ def main() -> Iterator[pd.DataFrame]:
     return results
 
 def test():
-    return scraping_stock_price('2330.TW')
+    return scraping_stock_price('0050.TW')
     # print('TSMC scraping Done')

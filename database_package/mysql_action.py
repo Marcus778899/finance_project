@@ -36,21 +36,33 @@ def insert_data(table_name: str, data: pd.DataFrame) -> str:
     '''
     return query script
     '''
-    columns = ', '.join(['`' + col + '`' for col in data.columns])
-    query = f"INSERT INTO {table_name} ({columns}) VALUES "
-    for _, row in data.iterrows():
-        query += f'{tuple(row)},'
-    query = query[:-1] + ';'
+    if data is None:
+        return None
+    else:
+        columns = ', '.join(['`' + col + '`' for col in data.columns])
+        query = f"INSERT INTO {table_name} ({columns}) VALUES "
+        for _, row in data.iterrows():
+            query += f'{tuple(row)},'
+        query = query[:-1] + ';'
+
+        return query
+
+def drop_table(table_name: str) -> str:
+    '''
+    return query script
+    '''
+    query = f'DROP TABLE {table_name}'
 
     return query
+
 
 def execute_query(query: str) -> None:
     '''
     execute query
     '''
-    conn, cursor = next(get_conn())
-    conn.ping(reconnect=True)
-    cursor.execute(query)
-    conn.commit()
-
-    print(f'Query executed: \n{query}')
+    if query is not None:
+        conn, cursor = next(get_conn())
+        conn.ping(reconnect=True)
+        cursor.execute(query)
+        conn.commit()
+        print(f'Query executed: \n{query}')
