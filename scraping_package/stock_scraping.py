@@ -1,8 +1,6 @@
 import yfinance as yf
 import pandas as pd
 from datetime import datetime, timedelta
-from concurrent.futures import ThreadPoolExecutor
-from typing import Iterator
 
 def debug(func):
     def wrapper(*args, **kwargs):
@@ -47,14 +45,6 @@ def scraping_stock_price(stock_id: str) -> pd.DataFrame:
         print(e)
         print(f'Error scraping {stock_id}')
         return None
-    
-def main() -> Iterator[pd.DataFrame]:
-    stock_list = get_stock_list() 
-
-    with ThreadPoolExecutor(max_workers=10) as executor:
-        results = executor.map(scraping_stock_price, stock_list)
-
-    return results
 
 def test():
     return scraping_stock_price('0050.TW')

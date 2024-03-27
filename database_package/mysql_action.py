@@ -4,20 +4,15 @@ from secret import key
 import pandas as pd
 from datetime import datetime
 
-def get_conn():
-    conn = pymysql.connect(
-        host=key.mysql_host,
-        user=key.mysql_user,
-        password=key.mysql_password,
-        database=key.mysql_database,
-        charset='utf8mb4',
-        cursorclass=pymysql.cursors.DictCursor,
-    )
-    cursor = conn.cursor()
-    try:
-        yield conn, cursor
-    finally:
-        conn.close()
+conn = pymysql.connect(
+    host=key.mysql_host,
+    user=key.mysql_user,
+    password=key.mysql_password,
+    database=key.mysql_database,
+    charset='utf8mb4',
+    cursorclass=pymysql.cursors.DictCursor,
+)
+cursor = conn.cursor()
 
 def create_table(table_name: str) -> str:
     '''
@@ -61,8 +56,13 @@ def execute_query(query: str) -> None:
     execute query
     '''
     if query is not None:
-        conn, cursor = next(get_conn())
-        conn.ping(reconnect=True)
-        cursor.execute(query)
-        conn.commit()
-        print(f'Query executed: \n{query}')
+        try:
+            cursor.execute(query)
+            conn.commit()
+        except Exception as e:
+            print(e)
+
+def close_driver():
+    cursor.close()
+    conn.close()
+    
