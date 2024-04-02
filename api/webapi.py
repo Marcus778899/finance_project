@@ -1,7 +1,6 @@
 from fastapi import FastAPI
 from api.response_model import StrikePriceRequest
 from scraping_package import options_scraping
-from api import SQL_connect
 
 
 app = FastAPI(
@@ -11,7 +10,6 @@ app = FastAPI(
 )
 
 merge_df = options_scraping.main()
-sql = SQL_connect
 
 @app.get('/data')
 async def get_data():
