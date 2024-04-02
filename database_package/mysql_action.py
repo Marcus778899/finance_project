@@ -14,6 +14,13 @@ conn = pymysql.connect(
 )
 cursor = conn.cursor()
 
+def debug(func):
+    def wrapper(*args, **kwargs):
+        print(f"Returning \n{func(*args, **kwargs)}")
+        print('-' * 50)
+        return func(*args, **kwargs)
+    return wrapper
+
 def create_table(table_name: str) -> str:
     '''
     return query script

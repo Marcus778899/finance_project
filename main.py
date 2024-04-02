@@ -1,12 +1,13 @@
 from scraping_package import stock_scraping
 from database_package import mysql_action
-from concurrent.futures import ThreadPoolExecutor
+from tqdm import tqdm
 
 sql = mysql_action
 scarping = stock_scraping
 def main():
     stock_list = stock_scraping.get_stock_list()
-    def action(stock_id: str):
+    def stock_price(stock_id: str):
+        table_name = 'stock_price'
         result = scarping.scraping_stock_price(stock_id)
         if result is not None:
             try:
@@ -18,16 +19,16 @@ def main():
                 print(stock_id)
         print('=' * 50)
 
-    with ThreadPoolExecutor(max_workers=10) as executor:
-        executor.map(action, stock_list)
-        executor.shutdown(wait=True)
+    progress = tqdm(total= len(stock_list), desc= 'Progress')
+    for stock_id in stock_list:
+        stock_price(stock_id)
+        progress.update(1)
 
 if __name__ == '__main__':
-    table_name = 'stock_price'
-    drop_query = sql.drop_table(table_name)
-    create_query = sql.create_table(table_name)
-    sql.execute_query(drop_query)
-    sql.execute_query(create_query)
+    # drop_query = sql.drop_table(table_name)
+    # create_query = sql.create_table(table_name)
+    # sql.execute_query(drop_query)
+    # sql.execute_query(create_query)
 
     main()
 

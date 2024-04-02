@@ -58,6 +58,3 @@ def main():
     test = parse_html(soup, time_now)
 
     return test
-
-if __name__ == '__main__':
-    main()
