@@ -7,7 +7,7 @@ from time import sleep
 from tqdm import tqdm
 from argparse import ArgumentParser
 from database_package import mysql_action
-from scraping_package import get_stock_list, company_finance_statement
+from scraping_package import get_stock_list,finance_statement
 
 
 
@@ -44,30 +44,30 @@ def argument():
     for i in range(args.n):
         print('Hello, {}'.format(args.username))
 
-def finance_statement(stock_id: str):
-    result = company_finance_statement(stock_id)
-    if result is not None:
-        try:
-            query = mysql_action.insert_data('finance_statement', result)
-            mysql_action.execute_query(query)
-            print('Finance Statement: {} Done'.format(stock_id))
-        except Exception as e:
-            print(e)
-            print('Finance Statement: {} Failed'.format(stock_id))
+def finance_statement_scraping():
+    stock_list = get_stock_list()
+    stock_list = [stock.split('.')[0] for stock in stock_list]
+
+    sql_action = mysql_action
+#region for sql
+    create_query = sql_action.create_table('finance_statement')
+    sql_action.execute_query(create_query)
+    sql_action.conn.commit()
+    def input_data(df):
+        insert_query = sql_action.insert_data('finance_statement', df)
+        sql_action.execute_query(insert_query)
+        sql_action.conn.commit()
+#endregion
+
+    progress = tqdm(total=len(stock_list), desc='Progress')
+    for stock_id in stock_list:
+        df = finance_statement(stock_id).finance_report()
+        progress.update(1)
+        input_data(df)
+        print(f'{stock_id} DONE')
         print('=' * 50)
 
-if __name__ == '__main__':
-    action = mysql_action
-    create_query = action.create_table('finance_statement')
-    try:
-        action.execute_query(create_query)
+    sql_action.close_driver()
 
-        stock_list = get_stock_list()
-        progress = tqdm(total=len(stock_list), desc='Progress')
-        for stock_id in stock_list:
-            finance_statement(stock_id)
-            progress.update(1)
-            sleep(1)
-            progress.set_description('Progress: {}'.format(stock_id))
-    finally:
-        action.close_driver()
+if __name__ == '__main__':
+    finance_statement_scraping()

@@ -1,8 +1,7 @@
 import yfinance as yf
 import pandas as pd
 from datetime import datetime, timedelta
-from pathlib import Path
-import json
+from typing import List
 
 def debug(func):
     def wrapper(*args, **kwargs):
@@ -13,7 +12,7 @@ def debug(func):
         return func(*args, **kwargs)
     return wrapper
 
-def get_stock_list():
+def get_stock_list() -> List[str]:
     stock_list = pd.read_csv('./stock_info.csv')
     stock_list = stock_list[0:3171]
 
@@ -48,40 +47,4 @@ def scraping_stock_price(stock_id: str) -> pd.DataFrame:
         print(f'Error scraping {stock_id}')
         return None
 
-def company_finance_statement(stock_id: str) -> pd.DataFrame:
-    stock = yf.Ticker(stock_id)
-    df = stock.financials
-    df = df.T
-    df['Year'] = df.index.strftime('%Y')
-    df['stock_id'] = stock_id.split('.')[0]
-    df.reset_index(inplace=True)
-    df.drop('index',axis=1, inplace=True)
-    columns_to_convert = [col for col in df.columns if col not in ['Year', 'stock_id']]
-    df[columns_to_convert] = df[columns_to_convert].astype('float16')
 
-    def schema_write():
-        config_path = Path('scraping_package/config.json')
-        with open(config_path, 'r') as f:
-            config = json.load(f)
-        schema_path = Path(config['schema_file_path'])
-
-        type_of_data = df.dtypes
-        schema = {}
-        for index,types in type_of_data.items():
-            schema[index] = types.name
-        schema_df = pd.DataFrame(schema.items(), columns = ['column', 'data_type'])
-
-        with pd.ExcelWriter(schema_path, engine='openpyxl', mode='a') as writer:
-            schema_df.to_excel(writer, sheet_name='finance_statement', index=False)
-
-        print(f'Finance statement schema write to {schema_path}')
-
-    return df
-
-@debug
-def test():
-    df = company_finance_statement('2330.TW')
-    return df
-
-if __name__ == '__main__':
-    test()

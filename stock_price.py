@@ -1,14 +1,13 @@
-from scraping_package import stock_scraping
+from scraping_package import get_stock_list,scraping_stock_price
 from database_package import mysql_action
 from tqdm import tqdm
 
 sql = mysql_action
-scarping = stock_scraping
 def main():
-    stock_list = stock_scraping.get_stock_list()
+    stock_list = get_stock_list()
     def stock_price(stock_id: str):
         table_name = 'stock_price'
-        result = scarping.scraping_stock_price(stock_id)
+        result = scraping_stock_price(stock_id)
         if result is not None:
             try:
                 query = sql.insert_data(table_name, result)

@@ -1,14 +1,14 @@
 import pymysql
 import pymysql.cursors
-from secret import key
+from secret import mysql_database,mysql_host,mysql_password,mysql_user
 import pandas as pd
-from datetime import datetime
+
 
 conn = pymysql.connect(
-    host=key.mysql_host,
-    user=key.mysql_user,
-    password=key.mysql_password,
-    database=key.mysql_database,
+    host=mysql_host,
+    user=mysql_user,
+    password=mysql_password,
+    database=mysql_database,
     charset='utf8mb4',
     cursorclass=pymysql.cursors.DictCursor,
 )
@@ -30,7 +30,7 @@ def create_table(table_name: str) -> str:
     sql = f'CREATE TABLE IF NOT EXISTS {table_name} ('
     for schema in table_schema:
         sql += f'`{schema["column"]}` {schema["data_type"]},'
-    sql = sql[:-1] + ')'
+    sql = sql[:-1] + ');'
     
     return sql
 
