@@ -1,7 +1,7 @@
 import yfinance as yf
 import pandas as pd
 from datetime import datetime, timedelta
-from typing import List
+from typing import Set
 
 def debug(func):
     def wrapper(*args, **kwargs):
@@ -12,7 +12,7 @@ def debug(func):
         return func(*args, **kwargs)
     return wrapper
 
-def get_stock_list() -> List[str]:
+def get_stock_list() -> Set[str]:
     stock_list = pd.read_csv('./stock_info.csv')
     stock_list = stock_list[0:3171]
 
@@ -26,7 +26,7 @@ def get_stock_list() -> List[str]:
     for key, value in pattern.items():
         stock_list['type'] = stock_list['type'].str.replace(key, value)
 
-    dict_stock_list = [stock for stock in stock_list.index + '.' + stock_list['type']]
+    dict_stock_list = {stock for stock in stock_list.index + '.' + stock_list['type']}
 
     return dict_stock_list
 

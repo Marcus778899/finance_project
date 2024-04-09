@@ -57,6 +57,17 @@ def drop_table(table_name: str) -> str:
 
     return query
 
+def select_data(table_name: str, columns: list = None) -> str:
+    '''
+    return query script
+    :param table_name: [stock_price, finance_statement]
+    '''
+    if columns is None:
+        query = f'SELECT * FROM {table_name}'
+    else:
+        query = f'SELECT {", ".join(columns)} FROM {table_name}'
+
+    return query
 
 def execute_query(query: str) -> None:
     '''

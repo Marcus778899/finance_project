@@ -8,6 +8,7 @@ from tqdm import tqdm
 from argparse import ArgumentParser
 from database_package import mysql_action
 from scraping_package import get_stock_list,finance_statement
+from time import sleep
 
 
 
@@ -70,6 +71,7 @@ def finance_statement_scraping():
             input_data(df)
         print(f'{stock_id} DONE')
         print('=' * 50)
+        sleep(2)
 
     sql_action.close_driver()
 

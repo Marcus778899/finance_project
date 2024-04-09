@@ -24,10 +24,6 @@ def main():
         progress.update(1)
 
 if __name__ == '__main__':
-    # drop_query = sql.drop_table(table_name)
-    # create_query = sql.create_table(table_name)
-    # sql.execute_query(drop_query)
-    # sql.execute_query(create_query)
 
     main()
 
