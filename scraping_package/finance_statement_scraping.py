@@ -4,7 +4,6 @@ from bs4 import BeautifulSoup as bs
 import pandas as pd
 from enum import Enum
 from io import StringIO
-from typing import Union
 
 
 class type_category(Enum):
@@ -64,6 +63,7 @@ class FinanceScraping:
 
         sheet.columns = sheet.columns.str.replace('季度', 'item')
         sheet['stock_id'] = self.stock_id
+        sheet.replace("無", pd.NA, inplace=True)
         return sheet
 
     def dividend_report(self) -> pd.DataFrame:

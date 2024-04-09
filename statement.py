@@ -54,20 +54,31 @@ def finance_statement_scraping():
     sql_action.execute_query(create_query)
     sql_action.conn.commit()
     def input_data(df):
-        insert_query = sql_action.insert_data('finance_statement', df)
-        sql_action.execute_query(insert_query)
-        sql_action.conn.commit()
+        insert_query = sql_action.insert_data('finance_statement', df).replace("<NA>", "NULL")
+        try:
+            sql_action.execute_query(insert_query)
+            sql_action.conn.commit()
+        except Exception as e:
+            print(e)
 #endregion
 
     progress = tqdm(total=len(stock_list), desc='Progress')
     for stock_id in stock_list:
         df = finance_statement(stock_id).finance_report()
         progress.update(1)
-        input_data(df)
+        if df is not None:
+            input_data(df)
         print(f'{stock_id} DONE')
         print('=' * 50)
 
     sql_action.close_driver()
+
+def testing():
+    sql_action = mysql_action
+    df = finance_statement('1259').finance_report()
+    print(df)
+    sql_action.execute_query(sql_action.insert_data('finance_statement', df).replace("<NA>", "NULL"))
+    sql_action.conn.commit()
 
 if __name__ == '__main__':
     finance_statement_scraping()
