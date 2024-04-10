@@ -1,7 +1,7 @@
 import requests as req
 import pandas as pd
 from bs4 import BeautifulSoup as bs
-from datetime import datetime, timedelta
+from datetime import datetime
 
 def debug(func):
     def wrapper(*args, **kwargs):

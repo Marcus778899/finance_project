@@ -30,6 +30,27 @@ def get_stock_list() -> Set[str]:
 
     return dict_stock_list
 
+def stock_list_for_basic_information() -> dict:
+    stock_list = pd.read_csv('./stock_info.csv')
+    stock_list = stock_list[0:3171]
+
+    stock_list.set_index('stock_id', inplace=True)
+
+    output_dict = {}
+    for index, row in stock_list.iterrows():
+        output_dict[index] = row['industry_category']
+
+    exclude_type = ['ETF','上櫃指數股票型基金(ETF)','指數投資證券(ETN)','受益證券','ETN']
+    key_to_remove = []
+    for key, value in output_dict.items():
+        if value in exclude_type:
+            key_to_remove.append(key)
+
+    for key in key_to_remove:
+        output_dict.pop(key)
+
+    return output_dict
+        
 @debug
 def scraping_stock_price(stock_id: str) -> pd.DataFrame:
     try:
