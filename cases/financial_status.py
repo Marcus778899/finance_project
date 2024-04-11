@@ -6,7 +6,6 @@ import os
 sys.path.append(os.getcwd())
 import pandas as pd
 from database_package import mysql_action
-from sklearn.preprocessing import MinMaxScaler
 
 
 def load_data(stock_id : str) -> pd.DataFrame:
