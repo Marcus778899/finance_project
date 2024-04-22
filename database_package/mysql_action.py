@@ -69,6 +69,13 @@ def select_data(table_name: str, columns: list = None) -> str:
 
     return query
 
+def stock_id_already_exist(table_name: str) -> list:
+    '''
+    check stock_id already exist
+    '''
+    query = f'SELECT DISTINCT(股票代號) FROM {table_name};'
+    return query
+
 def execute_query(query: str) -> None:
     '''
     execute query

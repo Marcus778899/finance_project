@@ -4,8 +4,6 @@ from bs4 import BeautifulSoup as bs
 import pandas as pd
 from enum import Enum
 from io import StringIO
-
-
 class type_category(Enum):
     monthly_revenue = 'monthly-revenue'
     eps = 'eps'
@@ -34,7 +32,6 @@ def scraping_finance_statement(stock_id: str, type: type_category) -> pd.DataFra
             print(f"Can\'t find {stock_id}")
         else:
             print(f'Else Error')
-
 
 class FinanceScraping:
     def __init__(self, stock_id: str) -> None:

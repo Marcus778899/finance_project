@@ -4,3 +4,4 @@ secret
 *.csv
 portfolio
 config.json
+test.py

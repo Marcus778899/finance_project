@@ -7,7 +7,7 @@ from time import sleep
 from tqdm import tqdm
 from argparse import ArgumentParser
 from database_package import mysql_action
-from scraping_package import get_stock_list,finance_statement
+from scraping_package import stock_list_with_suffix,finance_statement
 from time import sleep
 
 
@@ -46,8 +46,7 @@ def argument():
         print('Hello, {}'.format(args.username))
 
 def finance_statement_scraping():
-    stock_list = get_stock_list()
-    stock_list = [stock.split('.')[0] for stock in stock_list]
+    stock_list = stock_list_with_suffix()
 
     sql_action = mysql_action
 #region for sql
@@ -75,12 +74,6 @@ def finance_statement_scraping():
 
     sql_action.close_driver()
 
-def testing():
-    sql_action = mysql_action
-    df = finance_statement('1259').finance_report()
-    print(df)
-    sql_action.execute_query(sql_action.insert_data('finance_statement', df).replace("<NA>", "NULL"))
-    sql_action.conn.commit()
 
 if __name__ == '__main__':
     finance_statement_scraping()
