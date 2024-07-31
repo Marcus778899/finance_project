@@ -1,10 +1,12 @@
 import os
 import logging
+import json
 import configparser
 import pandas as pd
-import pymysql
+from sqlalchemy import create_engine
 
 config_file = os.path.join(os.path.dirname(__file__),'loginINFO.cfg')
+table_schema_file = os.path.join(os.path.dirname(__file__), 'table_schema.json')
 
 if config_file:
     config = configparser.ConfigParser()
@@ -18,37 +20,44 @@ if config_file:
 class MariaDB:
     def __init__(self):
 
-        self.conn = pymysql.connect(
-            host=host,
-            port=int(port),
-            user=user,
-            password=password,
-            database=database
-        )
-        self.cursor = self.conn.cursor()
+        self.engine = create_engine(f"mysql+pymysql://{user}:{password}@{host}:{port}/{database}")
+        self.conn = self.engine.connect()
+        self.cursor = self.conn.connection.cursor()
+
         logging.info("MariaDB connection established.")
 
     def close_driver(self):
 
         self.cursor.close()
         self.conn.close()
+        self.engine.dispose()
         logging.info("MariaDB connection closed.")
+
+    def create_table(self, table_name: str):
+        with open (table_schema_file, 'r') as f:
+            table_schema = json.load(f)[table_name]
+
+        query = f"CREATE TABLE IF NOT EXISTS {table_name} ("
+        for key, value in table_schema.items():
+            query += f"{key} {value}, "
+        query = query[:-2] + ");"
+        
+        try:
+            self.cursor.execute(query)
+            self.conn.commit()
+            logging.info(f"Table {table_name} created successfully.")
+        except Exception as e:
+            logging.warning(f"Error creating table: {e}")
 
     def insert_data(self, table_name: str, df: pd.DataFrame):
 
-        logging.info(f"Inserting data into {table_name}...")
-        
-        columns = ', '.join(['`' + col + '`' for col in df.columns])
-        query = f"INSERT INTO {table_name} ({columns}) VALUES ("
-        
         try:
-            self.cursor.execute(
-                query,
-                [tuple(row) for row in df.itertuples(index = False)]
-            )
+            df.to_sql(table_name, self.engine, if_exists='append', index=False)
         except Exception as e:
             logging.error(f"Error inserting data: {e}")
-    
+
+        logging.info("Data insertion completed.")
+
     def select_data(self, query: str) -> pd.DataFrame:
 
         logging.info(f"Executing query: {query}")
@@ -68,7 +77,6 @@ class MariaDB:
     def delete_data(self, table_name: str, condition: str):
 
         logging.info(f"Deleting data from {table_name} where {condition}...")
-
         query = f"DELETE FROM {table_name} WHERE {condition}"
 
         try:

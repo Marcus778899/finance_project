@@ -1,0 +1,10 @@
+{
+    "stock_list":{
+        "stock": "varchar(30) NOT NULL PRIMARY KEY ",
+        "ISIN_Code": "varchar(30)",
+        "date_market": "date",
+        "category_market": "varchar(30)",
+        "category_industry": "varchar(30)",
+        "CFICode": "varchar(30)"
+    }
+}
