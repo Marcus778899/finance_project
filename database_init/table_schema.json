@@ -6,5 +6,17 @@
         "category_market": "varchar(30)",
         "category_industry": "varchar(30)",
         "CFICode": "varchar(30)"
+    },
+    "stock_price":{
+        "stock": "varchar(30) NOT NULL",
+        "stock_name": "varchar(30)",
+        "close_price": "float",
+        "open_price": "float",
+        "high_price": "float",
+        "low_price": "float",
+        "upper_limit": "float",
+        "lower_limit": "float",
+        "volume": "float",
+        "date": "date"
     }
 }

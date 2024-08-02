@@ -1,12 +1,19 @@
 import os
+import re
 import logging
 import json
 import configparser
 import pandas as pd
 from sqlalchemy import create_engine
 
-config_file = os.path.join(os.path.dirname(__file__),'loginINFO.cfg')
-table_schema_file = os.path.join(os.path.dirname(__file__), 'table_schema.json')
+config_file = os.path.join(
+    os.path.dirname(__file__),
+    'loginINFO.cfg'
+    )
+table_schema_file = os.path.join(
+    os.path.dirname(__file__), 
+    'table_schema.json'
+    )
 
 if config_file:
     config = configparser.ConfigParser()
@@ -85,3 +92,17 @@ class MariaDB:
             logging.info(f"Data deleted successfully.\nCondition is {condition}")
         except Exception as e:
             logging.error(f"Error deleting data: {e}")
+
+    def parse_stock_list(self) -> dict:
+        df = self.select_data("SELECT * FROM stock_list;")
+        df = df.set_index('stock').to_dict()['category_market']
+        stock_list = []
+        for key, value in df.items():
+            stock_code = re.findall(r'\d+', key)[0]
+            if value == '上市':
+                prefix = 'tse'
+                stock_list.append(f"{prefix}_{stock_code}.tw")
+            if value == '上櫃':
+                prefix = 'otc'
+                stock_list.append(f"{prefix}_{stock_code}.tw")
+        return stock_list

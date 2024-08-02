@@ -47,7 +47,5 @@ def main():
     for url in url_list:
         df_tmp = scraping_stock_list(url)
         df = pd.concat([df, df_tmp], ignore_index=True)
-    print(df.head(3))
-    print(df.dtypes)
     return df
     
