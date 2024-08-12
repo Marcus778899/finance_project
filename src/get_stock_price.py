@@ -6,9 +6,15 @@ from tqdm import tqdm
 import requests
 from . import stock_list
 import pandas as pd
+import time
+import time
     
 def scraping(date: datetime):
 
+    if date.weekday() == 5 or date.weekday() == 6:
+        logging.error("Saturday or Sunday is not a working day")
+        return None
+    
     year = date.year
     month = date.month
     day = date.day
@@ -16,14 +22,17 @@ def scraping(date: datetime):
 
     df = []
 
-    pbar = tqdm(stock_list)
-    for prefix in pbar:
+    pbar = tqdm(stock_list, unit="stock")
+    for index, prefix in enumerate(pbar):
+        if index % 10 == 0:
+            time.sleep(5)
         pbar.set_description(f"Processing {prefix}")
         url = f"https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch={prefix}_{suffix}"
 
         payload = {}
         headers = {
-        'Cookie': 'JSESSIONID=BBA418118B0189B06265CBFC534BB4C8'
+            'content-type':'application/json',
+            'user-agent':'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_3) AppleWebKit/604.5.6 (KHTML, like Gecko) Version/11.0.3 Safari/604.5.6'
         }
         logging.info(f"Now request: {prefix} on {suffix}")
         response = requests.request("GET", url, headers=headers, data=payload)
