@@ -1,19 +1,19 @@
 # https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch={上市或上櫃)_{股票代號}.tw_{日期}"
 import json
+import time
 import logging
-import random
 from datetime import datetime
 from tqdm import tqdm
 import requests
 import pandas as pd
 from fake_useragent import UserAgent
 from . import stock_list
-from .free_proxy import proxies
+# import random
+# from .free_proxy import proxies
 
 class ScrapingStockPrice:
     def __init__(self):
-        logging.info("Initializing ScrapingStockPrice class")
-        self.prxoy_list = proxies()
+        self.stock_list = stock_list
 
     def request_url(self, url, headers):
         """
@@ -22,20 +22,21 @@ class ScrapingStockPrice:
         """
         while True:
             try:
-                ip = random.choice(self.prxoy_list)
-                proxy = {'http': ip, 'https': ip}
-                logging.info(f"proxy => {ip}")
+                # ip = random.choice(self.prxoy_list)
+                # proxy = {'http': ip, 'https': ip}
+                # logging.info(f"proxy => {ip}")
                 response = requests.request(
                     "GET",
                     url,
                     headers=headers,
-                    proxies=proxy,
+                    # proxies=proxy,
                     timeout=5
                 )
                 content = json.loads(response.text)['msgArray'][0]
                 return content
             except requests.exceptions.RequestException as e:
                 logging.error(f"Request failed: {e}")
+                time.sleep(150)
                 continue
 
     def main(self,date: datetime) -> pd.DataFrame:
@@ -51,7 +52,7 @@ class ScrapingStockPrice:
 
         df = []
 
-        pbar = tqdm(stock_list, unit="stock")
+        pbar = tqdm(self.stock_list, unit="stock")
         for prefix in pbar:
             pbar.set_description(f"Processing {prefix}")
             url = f"https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch={prefix}_{suffix}"
@@ -88,6 +89,7 @@ class ScrapingStockPrice:
                 'date': datetime.strptime(suffix,'%Y%m%d').strftime('%Y-%m-%d')
             }
             df.append(data)
+            time.sleep(1)
 
         df = pd.DataFrame(df)
 

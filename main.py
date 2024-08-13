@@ -5,7 +5,7 @@ from src import get_stock_list, ScrapingStockPrice
 
 
 def calculate_date():
-    start = datetime(2021,4,5)
+    start = datetime(2021,4,7)
     end = datetime.now() - timedelta(days=1)
     time_list = []
     while start <= end:
