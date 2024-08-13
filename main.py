@@ -1,11 +1,11 @@
 import time
 from datetime import datetime, timedelta
 from database_init import db
-from src import get_stock_list, scraping_stock_a_day
+from src import get_stock_list, ScrapingStockPrice
 
 
 def calculate_date():
-    start = datetime(2021,3,9)
+    start = datetime(2021,4,5)
     end = datetime.now() - timedelta(days=1)
     time_list = []
     while start <= end:
@@ -19,11 +19,12 @@ def scarping_stock_list():
     db.insert_data("stock_list", stock_list)
 
 def scraping_stock_price():
+    action = ScrapingStockPrice()
     db.create_table("stock_price")
     time_list = calculate_date()
     for times in time_list:
         print(f"Now start scraping {times}")
-        df = scraping_stock_a_day(times)
+        df = action.main(times)
         if df is None:
             continue
         else:
@@ -33,5 +34,7 @@ def scraping_stock_price():
         print("=" * 100)
 
 if __name__ == "__main__":
-    scraping_stock_price()
-    db.close_driver()
+    try:
+        scraping_stock_price()
+    finally:
+        db.close_driver()

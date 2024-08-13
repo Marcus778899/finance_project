@@ -18,6 +18,7 @@ openpyxl = "3.1.2"
 html5lib = "1.1"
 ipykernel = "6.29.5"
 tqdm = "4.66.4"
+fake-useragent = "1.5.1"
 
 [build-system]
 requires = ["poetry-core"]
