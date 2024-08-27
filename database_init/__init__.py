@@ -1,7 +1,3 @@
-import logging
+from log import logger
 from .mariadb_config import MariaDB
-
-logging.basicConfig(level=logging.INFO)
-
-db = MariaDB()
-stock_list = db.parse_stock_list()
+from . import query_generate

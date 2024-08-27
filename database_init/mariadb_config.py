@@ -1,7 +1,6 @@
+from . import logger
 import os
 import re
-import logging
-import json
 import configparser
 import pandas as pd
 from sqlalchemy import create_engine
@@ -26,49 +25,34 @@ if config_file:
 
 class MariaDB:
     def __init__(self):
-
         self.engine = create_engine(f"mysql+pymysql://{user}:{password}@{host}:{port}/{database}")
         self.conn = self.engine.connect()
         self.cursor = self.conn.connection.cursor()
+        logger.debug("MariaDB connection established.")
 
-        logging.info("MariaDB connection established.")
-
-    def close_driver(self):
+    def __del__(self):
 
         self.cursor.close()
         self.conn.close()
         self.engine.dispose()
-        logging.info("MariaDB connection closed.")
+        logger.debug("MariaDB connection closed.")
 
-    def create_table(self, table_name: str):
-        with open (table_schema_file, 'r') as f:
-            table_schema = json.load(f)[table_name]
-
-        query = f"CREATE TABLE IF NOT EXISTS {table_name} ("
-        for key, value in table_schema.items():
-            query += f"{key} {value}, "
-        query = query[:-2] + ");"
-        
+    def execute_query(self, query: str):
+        '''
+        execute query and commit to database
+        no any return
+        '''
         try:
             self.cursor.execute(query)
             self.conn.commit()
-            logging.info(f"Table {table_name} created successfully.")
+            logger.debug("Query executed successfully.")
         except Exception as e:
-            logging.warning(f"Error creating table: {e}")
+            logger.exception(f"Error executing query: {e}")
 
-    def insert_data(self, table_name: str, df: pd.DataFrame):
-
-        try:
-            df.to_sql(table_name, self.engine, if_exists='append', index=False)
-        except Exception as e:
-            logging.error(f"Error inserting data: {e}")
-
-        logging.info("Data insertion completed.")
-
-    def select_data(self, query: str) -> pd.DataFrame:
-
-        logging.info(f"Executing query: {query}")
-
+    def export_data(self, query:str) -> pd.DataFrame:
+        '''
+        return Dataframe from database
+        '''
         try:
             self.cursor.execute(query)
             df = pd.DataFrame(
@@ -78,31 +62,33 @@ class MariaDB:
             return df
         
         except Exception as e:
-            logging.error(f"Error executing query: {e}")
+            logger.exception(f"Error executing query: {e}")
             return None
-        
-    def delete_data(self, table_name: str, condition: str):
 
-        logging.info(f"Deleting data from {table_name} where {condition}...")
-        query = f"DELETE FROM {table_name} WHERE {condition}"
+    def insert_data(self, table_name: str, df: pd.DataFrame):
 
         try:
-            self.cursor.execute(query)
-            self.conn.commit()
-            logging.info(f"Data deleted successfully.\nCondition is {condition}")
+            df.to_sql(table_name, self.engine, if_exists='append', index=False)
         except Exception as e:
-            logging.error(f"Error deleting data: {e}")
+            logger.exception(f"Error inserting data: {e}")
+
+        logger.debug("Data insertion completed.")
 
     def parse_stock_list(self) -> dict:
-        df = self.select_data("SELECT * FROM stock_list;")
+        '''
+        return stock item list
+        '''
+        df = self.export_data("SELECT * FROM stock_list;")
         df = df.set_index('stock').to_dict()['category_market']
         stock_list = []
         for key, value in df.items():
             stock_code = re.findall(r'\d+', key)[0]
             if value == '上市':
-                prefix = 'tse'
-                stock_list.append(f"{prefix}_{stock_code}.tw")
+                stock_list.append(f"{stock_code}.TW")
             if value == '上櫃':
-                prefix = 'otc'
-                stock_list.append(f"{prefix}_{stock_code}.tw")
+                stock_list.append(f"{stock_code}.TWO")
         return stock_list
+    
+if __name__ == '__main__':
+    db = MariaDB()
+    print(db.parse_stock_list())

@@ -1,40 +1,49 @@
-import time
-from datetime import datetime, timedelta
-from database_init import db
-from src import get_stock_list, ScrapingStockPrice
+from datetime import datetime
+from tqdm import tqdm
+from time import sleep
+from src import get_stock_list, scraping_stock_price
+from database_init import MariaDB
+from database_init.query_generate import *
+from log import logger
 
+def set_stock_list():
+    '''
+    scraping stock_list from twse website
+    '''
+    table_name = "stock_list"
+    df = get_stock_list.main()
+    create_query = create_table_query(table_name)
+    db = MariaDB()
+    try:
+        db.execute_query(create_query)
+        db.insert_data(table_name, df)
+    except Exception as e:
+        logger.exception(e)
+        raise e
+    
+def scraping_stock():
+    '''
+    scraping stock price from yfinance
+    '''
+    table_name = "stock_price"
+    create_query = create_table_query(table_name)
+    db = MariaDB()
+    start_date = datetime(2017,1,1)
+    try:
+        stock_list = db.parse_stock_list()
+        db.execute_query(create_query)
+        for stock in tqdm(stock_list):
+            logger.info(f"Scraping {stock}")
+            df = scraping_stock_price(stock, start_date)
+            if df is not None:
+                db.insert_data(table_name, df)
+            else:
+                logger.warning(f"{stock} has no data")
+                pass
+            sleep(2)
 
-def calculate_date():
-    start = datetime(2021,4,7)
-    end = datetime.now() - timedelta(days=1)
-    time_list = []
-    while start <= end:
-        time_list.append(start)
-        start += timedelta(days=1)
-    return time_list
-
-def scarping_stock_list():
-    db.create_table("stock_list")
-    stock_list = get_stock_list.main()
-    db.insert_data("stock_list", stock_list)
-
-def scraping_stock_price():
-    action = ScrapingStockPrice()
-    db.create_table("stock_price")
-    time_list = calculate_date()
-    for times in time_list:
-        print(f"Now start scraping {times}")
-        df = action.main(times)
-        if df is None:
-            continue
-        else:
-            db.insert_data("stock_price", df)
-            print("NOW sleep for three minutes...")
-            time.sleep(180)
-        print("=" * 100)
+    except Exception as e:
+        logger.exception(e)
 
 if __name__ == "__main__":
-    try:
-        scraping_stock_price()
-    finally:
-        db.close_driver()
+    scraping_stock()
