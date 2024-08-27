@@ -21,7 +21,7 @@ def scraping_stock_price(stock_id: str, start_date: datetime) -> pd.DataFrame:
         return None
     
 if __name__ == "__main__":
-    stock_id = "032135.TW"
+    stock_id = "036893.TW"
     start_date = datetime(2023, 1, 1)
     df = scraping_stock_price(stock_id, start_date)
     print(df.head()) 
