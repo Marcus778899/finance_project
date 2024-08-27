@@ -10,9 +10,9 @@ table_schema_file = os.path.join(
 def debug(func):
     def wrapper(*args, **kwargs):
         logger.info(f"""
-Executing {func.__name__} \n
-Args: {args} \n
-Kwargs: {kwargs} \n
+Executing {func.__name__}
+Args: {args}
+Kwargs: {kwargs}
 Return: {func(*args, **kwargs)}
 """
         )

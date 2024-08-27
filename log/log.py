@@ -16,7 +16,7 @@ file_handler = logging.FileHandler(
                     encoding='utf-8',
                     mode='a'
                 )
-file_handler.setLevel(logging.WARNING)
+file_handler.setLevel(logging.WARN)
 file_handler.setFormatter(logging.Formatter('[%(asctime)s][%(name)s][%(levelname)s] %(message)s'))
 
 stream_handler = logging.StreamHandler()
