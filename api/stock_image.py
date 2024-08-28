@@ -60,7 +60,7 @@ class StockImage:
             histogram, 
             type= 'bar', 
             ax= axs, 
-            color=['green' if val >= 0 else 'red' for val in histogram], 
+            color=['red' if val >= 0 else 'green' for val in histogram], 
             width= 1.0, 
             panel= 2
         )
@@ -93,7 +93,7 @@ class StockImage:
         ax2.set_ylabel('Volume')
         ax3.set_ylabel('MACD')
 #region <text setting>
-        fig.text(0.50, 0.94, '0050', **image_font.title_font)
+        fig.text(0.50, 0.94, self.stock_id, **image_font.title_font)
         fig.text(0.12, 0.90, 'Last Date', **image_font.normal_label_font)
         fig.text(0.12, 0.86, 'Open/Close', **image_font.normal_label_font)
         fig.text(0.14, 0.86, 
