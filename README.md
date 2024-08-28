@@ -2,4 +2,4 @@
 
 > 利用fastapi與資料庫做串接
 
-![alt text](./image/image.png)
+![alt text](./image/stock_price.png)
