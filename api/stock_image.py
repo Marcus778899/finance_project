@@ -94,7 +94,7 @@ class StockImage:
         ax3.set_ylabel('MACD')
 #region <text setting>
         fig.text(0.50, 0.94, self.stock_id, **image_font.title_font)
-        fig.text(0.12, 0.90, 'Last Date', **image_font.normal_label_font)
+        fig.text(0.12, 0.90, f"{last_data['Date']}", **image_font.normal_label_font)
         fig.text(0.12, 0.86, 'Open/Close', **image_font.normal_label_font)
         fig.text(0.14, 0.86, 
                 f'{np.round(last_data["Open"], 3)}/{np.round(last_data["Close"], 3)}', **image_font.large_red_font

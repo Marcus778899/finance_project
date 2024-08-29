@@ -1,9 +1,10 @@
-from . import logger
 import os
 import re
 import configparser
+from time import time
 import pandas as pd
 from sqlalchemy import create_engine
+from . import logger
 
 config_file = os.path.join(
     os.path.dirname(__file__),
@@ -53,6 +54,7 @@ class MariaDB:
         '''
         return Dataframe from database
         '''
+        start_time = time()
         try:
             self.cursor.execute(query)
             df = pd.DataFrame(
@@ -64,25 +66,29 @@ class MariaDB:
         except Exception as e:
             logger.exception(f"Error executing query: {e}")
             return None
+        finally:
+            end_time = time()
+            logger.info(f"Query execution time: {end_time - start_time} seconds.")
 
     def insert_data(self, table_name: str, df: pd.DataFrame):
 
         try:
             df.to_sql(table_name, self.engine, if_exists='append', index=False)
+            logger.info(f"Data inserted into {table_name} successfully.")
         except Exception as e:
             logger.exception(f"Error inserting data: {e}")
 
         logger.debug("Data insertion completed.")
 
-    def parse_stock_list(self) -> dict:
+    def parse_basic_info(self) -> list[str]:
         '''
         return stock item list
         '''
-        df = self.export_data("SELECT * FROM stock_list;")
+        df = self.export_data("SELECT * FROM basic_info;")
         df = df.set_index('stock').to_dict()['category_market']
         stock_list = []
         for key, value in df.items():
-            stock_code = re.findall(r'\d+', key)[0]
+            stock_code = re.findall(r'^[A-Za-z0-9]+', key)[0]
             if value == '上市':
                 stock_list.append(f"{stock_code}.TW")
             if value == '上櫃':
@@ -91,4 +97,4 @@ class MariaDB:
     
 if __name__ == '__main__':
     db = MariaDB()
-    print(db.parse_stock_list())
+    print(db.parse_basic_info())

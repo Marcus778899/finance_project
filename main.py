@@ -1,8 +1,8 @@
 from datetime import datetime
 from tqdm import tqdm
 from time import sleep
-from src import get_stock_list, scraping_stock_price
-from database_init import MariaDB
+from src import get_stock_list, scraping_stock_price, daily_scraping
+from database_init import MariaDB, yfinance_stock_list
 from database_init.query_generate import *
 from log import logger
 
@@ -10,7 +10,7 @@ def set_stock_list():
     '''
     scraping stock_list from twse website
     '''
-    table_name = "stock_list"
+    table_name = "basic_info"
     df = get_stock_list.main()
     create_query = create_table_query(table_name)
     db = MariaDB()
@@ -30,7 +30,7 @@ def scraping_stock():
     db = MariaDB()
     start_date = datetime(2017,1,1)
     try:
-        stock_list = db.parse_stock_list()
+        stock_list = db.parse_basic_info()
         db.execute_query(create_query)
         for stock in tqdm(stock_list):
             logger.info(f"Scraping {stock}")
@@ -40,10 +40,27 @@ def scraping_stock():
             else:
                 logger.warning(f"{stock} has no data")
                 pass
-            sleep(2)
+
+    except Exception as e:
+        logger.exception(e)
+
+def missing_fill(time: str):
+    logger.info(f"filling missing data at {time}")
+    table_name = "stock_price"
+    db = MariaDB()
+    try:
+        stock_list = yfinance_stock_list()
+        for stock in tqdm(stock_list):
+            logger.info(f"Scraping {stock}")
+            df = daily_scraping(stock, time)
+            if df is not None:
+                db.insert_data(table_name, df)
+            else:
+                logger.warning(f"{stock} has no data")
+                pass
 
     except Exception as e:
         logger.exception(e)
 
 if __name__ == "__main__":
-    scraping_stock()
+    missing_fill("2024-08-28")

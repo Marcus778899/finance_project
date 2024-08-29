@@ -24,16 +24,29 @@ def create_table_query(table_name: str) -> str:
     with open(table_schema_file, 'r') as f:
         table_schema = json.load(f)[table_name]
     
-    query = f"CREATE TABLE IF NOT EXISTS {table_name} ("
-    for key, value in table_schema.items():
-        query += f"{key} {value}, "
-    query = query[:-2] + ");"
+    columns = []
+    condition = ""
 
+    for key, value in table_schema.items():
+        if key == "Condition":
+            if value != "None":
+                condition = value
+        else:
+            columns.append(f"{key} {value}")
+    
+    query = f"CREATE TABLE IF NOT EXISTS {table_name} ("
+    query += ", ".join(columns)
+    
+    if condition:
+        query += f", {condition}"
+    
+    query += ");"
+    
     return query
 
 @debug
 def select_data_query(table_name: str, condition: str = None):
-    query = f"SELECT * FROM {table_name}"
+    query = f"SELECT stock_id, Close, Open, High, Low, Volume, Date FROM {table_name}"
     if condition:
         query += f" WHERE {condition};"
     return query
