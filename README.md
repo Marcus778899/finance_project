@@ -1,6 +1,7 @@
 # Finance Project
 
-> 利用fastapi與資料庫做串接
+>利用fastapi與資料庫做串接 \
+>回傳到telegram(結果如下圖)
 
 ![alt text](./image/stock_price.png)
 
