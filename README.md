@@ -121,3 +121,5 @@ scraping()
 ## 參考來源
 
 [https://blog.csdn.net/Shepherdppz/article/details/117575286](https://blog.csdn.net/Shepherdppz/article/details/117575286)
+
+[簡易量化分析Quant Analysis](https://github.com/pyinvest/quant_basic_toturial/tree/master)
