@@ -1,6 +1,3 @@
+Logs/*
 __pycache__
 *.cfg
-*.lock
-*test*
-*.sh
-.handler-saves

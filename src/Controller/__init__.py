@@ -1,0 +1,1 @@
+from .ImageController import image_router
