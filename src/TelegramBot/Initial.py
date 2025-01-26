@@ -1,35 +1,41 @@
+import time
+
+from urllib3.exceptions import ProtocolError
+from requests.exceptions import ConnectionError, ReadTimeout
 from telebot import TeleBot
 
-from ..setting import send_info, TELEGRAM_INFO
+from . import send_info, TELEGRAM_INFO, send_warn, error_handle
+from .command_handler import register_all_handlers
 
 TOKEN = TELEGRAM_INFO['TOKEN']
 bot = TeleBot(TOKEN, parse_mode=None)
 
-from .response_image import *
-
+@error_handle
 def start_polling():
     send_info("Starting Telegram bot polling...")
+
+    retires_count = 0
+    max_retires = 5
+
+    while True:
+        try:
+            send_info("Bot is running")
+            register_all_handlers(bot)
+            bot.polling(none_stop=True, timeout=60, long_polling_timeout=60)
     
-    @bot.message_handler(commands=['start'])
-    def command_start(message):
-        bot.send_message(
-            message.chat.id, 
-            "Hello! I'm a bot\nType '/help' to get the user manual."
-            )
-        send_info("Received '/start' command")
-
-    @bot.message_handler(commands=['help'])
-    def command_help(message):
-        bot.send_message(
-            message.chat.id, 
-            "This is the help message.\nAvailable commands:\n/start - Start the bot\n/help - Show this help message."
-            )
-        send_info("Received '/help' command")
-
-    @bot.message_handler(commands=['stock'])
-    def start_message(message):
-        send_info('stock command')
-        bot.send_message(message.chat.id, 'Please Enter stock code')
-        bot.register_next_step_handler(message, request_stock)
-
-    bot.polling(none_stop=True)
+        except (ConnectionError, ReadTimeout, ProtocolError) as e:
+            send_warn(f"Connect Error: {e}")
+            retires_count += 1
+            if retires_count > max_retires:
+                send_warn("Max retries reached. Exiting polling...")
+                break
+            sleep_time = min(2 ** retires_count, 60)
+            send_info(f"Retrying in {sleep_time} seconds...")
+            time.sleep(sleep_time)
+        
+        except Exception as e:
+            send_info(f"Unexpected Error: {e}")
+            time.sleep(5)
+        
+        else:
+            retires_count = 0
