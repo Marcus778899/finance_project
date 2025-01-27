@@ -9,7 +9,6 @@
 
 * [**機器人連結**](https://t.me/Marcus_First_Bot)
 
-**結果**
 ![image](./docs/telegram.jpg)
 
 ### 參考來源

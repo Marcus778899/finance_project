@@ -3,8 +3,9 @@ import requests
 
 from .. import send_info, SERVER_INFO, send_warn
 
+request_body = {}
+
 def register_bullshit_handler(bot: TeleBot):
-    request_body = {}
     @bot.message_handler(commands=['bullshit'])
     def start_message(message):
         send_info("Recieved bullshit command")
@@ -12,9 +13,9 @@ def register_bullshit_handler(bot: TeleBot):
         bot.register_next_step_handler(message, enter_length)
 
     def enter_length(message):
-        send_info(f"Customer enter {topic}")
         chat_id = message.chat.id
         topic = message.text
+        send_info(f"Customer enter {topic}")
         request_body['topic'] = topic
         bot.send_message(chat_id,"Please enter content length")
         bot.register_next_step_handler(message, generate_content)
