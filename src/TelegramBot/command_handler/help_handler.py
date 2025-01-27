@@ -9,7 +9,8 @@ This is the help message.
 Available commands:\n
 /start - Start the bot
 /help - Show this help message.
-/stock - For display stock price image        
+/stock - For display stock price image 
+/bullshit - healthy for your soul      
 """
         bot.send_message(
             message.chat.id, 

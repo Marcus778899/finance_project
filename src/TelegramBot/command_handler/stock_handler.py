@@ -10,13 +10,14 @@ request_body = {}
 def register_stock_handler(bot: TeleBot):
     @bot.message_handler(commands=['stock'])
     def start_message(message):
-        print('Received /stock command')
+        send_info('Received /stock command')
         bot.send_message(message.chat.id, 'Please Enter stock code')
         bot.register_next_step_handler(message, request_stock)
 
 
     @error_handle
     def request_stock(message):
+        send_info("Reveive stock code")
         chat_id = message.chat.id
         request_body['stock_id'] = message.text
         bot.send_message(chat_id, 'Please Enter data length (<=500)')
@@ -24,6 +25,7 @@ def register_stock_handler(bot: TeleBot):
 
     @error_handle
     def request_length(message):
+        send_info("Reveive data length")
         chat_id = message.chat.id
         request_body['limit'] = message.text
         bot.send_message(chat_id, 'Please Enter Condition (or enter N)')
