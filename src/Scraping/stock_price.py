@@ -27,7 +27,6 @@ def daily_scraping(stock_id:str, date:str) -> pd.DataFrame|None:
         df.reset_index(inplace=True)
         df['Date'] = pd.to_datetime(df['Date'].dt.strftime('%Y-%m-%d'))
         df['stock_id'] = stock_id.split('.')[0]
-        send_info(f"Scraping stock price for {stock_id} on {start_date} success")
         return df
     else:
         send_warn(f"No data found for {stock_id} on {start_date}")

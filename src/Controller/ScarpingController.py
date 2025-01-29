@@ -1,25 +1,24 @@
 from time import sleep
+from datetime import datetime
 
 from fastapi import APIRouter, HTTPException,status, Response
 from ..setting import send_warn
 from ..Database import sql_client
 from ..Scraping import daily_scraping, setting_stock_list
 
-scraping = APIRouter(prefix="/scraping",tags=['scraping'])
+scraping_router = APIRouter(prefix="/scraping",tags=['scraping'])
 
-@scraping.post("/daily")
-async def daily_work(date: str):
+@scraping_router.get("/daily")
+async def daily_work(date: str=datetime.now().strftime("%Y-%m-%d")):
     """
     ## Hint:
     date format need to be "%Y-%m-%d" beginning
     """
     stock_list = setting_stock_list()
-
     try:
         for stock in stock_list:
             df = daily_scraping(stock, date)
             if df is None:
-                send_warn(f"stock {stock} Data not Found")
                 continue
             sql_client.insert_data("stock_price", df)
             sleep(1)
