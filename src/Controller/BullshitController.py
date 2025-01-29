@@ -1,4 +1,3 @@
-import json
 from fastapi import APIRouter,HTTPException,status
 from pydantic import BaseModel
 from ..Bullshit.helath_soul import BullShit

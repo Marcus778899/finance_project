@@ -5,12 +5,12 @@ from ..setting import send_info
 image_router = APIRouter(prefix="/image",tags=["images"])
 
 
-@image_router.post("")
-def get_img(stock_id: str, condition: str = None, limit: int = 200):
+@image_router.get("")
+def get_img(stock_id: str, limit: int = 200):
     try:
-        send_info(f"stock_id: {stock_id};condition: {condition};limit: {limit}")
+        send_info(f"stock_id: {stock_id};limit: {limit}")
 
-        action = StockImage(stock_id, limit, condition)
+        action = StockImage(stock_id, limit)
         img_buf = action.draw_picture()
 
         headers = {'Content-Disposition': 'inline; filename="out.png"'}

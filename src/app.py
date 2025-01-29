@@ -3,8 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .setting import LogMiddleware, send_info
-from .Controller import image_router
-from .Controller.BullshitController import bullshit_router
+from .Controller import all_controller
 from .TelegramBot.Initial import start_polling
 
 async def app_lifespan(app: FastAPI):
@@ -24,8 +23,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-app.include_router(image_router)
-app.include_router(bullshit_router)
+
+for controller in all_controller:
+    app.include_router(controller)
 
 @app.get("/")
 async def Hello_world():
